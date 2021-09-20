@@ -166,9 +166,6 @@ setup_kwargs = dict(
     install_requires=[
         'setuptools',
         # -*- Extra requirements: -*-
-        'plone.api',
-        'Products.GenericSetup>=1.8.2',
-        'z3c.jbot',
     ],
     entry_points="""
     [z3c.autoinclude.plugin]
