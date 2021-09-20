@@ -10,21 +10,33 @@ and for this reason we provide a little utility here;
 see the ../../../README.rst file for a short usage description.
 """
 
+# Python compatibility:
+from __future__ import absolute_import
+
 __all__ = [
     'make_metadata_updater',
     ]
 
-# Local imports:
 try:
-    from plone.registry.interfaces import IRegistry
-    from .config import FULL_VERSION_KEY, VERSION_KEY
-    from .exceptions import (ReindexingError, ObjectNotFound,
-            UsageTypeError, UsageValueError,
-            )
-    from zope.component import getUtility
-    from Missing import Value as Missing_Value
+    # Zope:
     from Products.CMFCore.utils import getToolByName
     from ZODB.POSException import ConflictError
+    from zope.component import getUtility
+
+    # Plone:
+    from plone.registry.interfaces import IRegistry
+
+    # 3rd party:
+    from Missing import Value as Missing_Value
+
+    # Local imports:
+    from .config import FULL_VERSION_KEY, VERSION_KEY
+    from .exceptions import (
+        ObjectNotFound,
+        ReindexingError,
+        UsageTypeError,
+        UsageValueError,
+        )
 except ImportError as e:
     if __name__ == '__main__':  # doctest
         VERSION_KEY = 'metadata_version'
@@ -309,5 +321,6 @@ def make_metadata_updater(context, logger=None, metadata_version=None,
 
 
 if __name__ == '__main__':
+    # Standard library:
     import doctest
     doctest.testmod()

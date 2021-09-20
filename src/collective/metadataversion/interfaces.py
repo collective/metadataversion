@@ -3,6 +3,9 @@
 collective.metadataversion: interfaces
 """
 
+# Python compatibility:
+from __future__ import absolute_import
+
 # Zope:
 from zope import schema
 

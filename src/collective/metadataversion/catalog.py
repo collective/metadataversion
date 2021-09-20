@@ -2,6 +2,9 @@
 """
 collective.metadataversion: "indexers" (more precisely, metadata adapters)
 """
+# Python compatibility:
+from __future__ import absolute_import
+
 # Zope:
 from Products.CMFCore.interfaces import IIndexableObject
 from zope.component import getUtility
