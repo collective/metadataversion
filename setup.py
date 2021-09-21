@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*- vim: et ts=8 sw=4 sts=4 si tw=79 cc=+1
 """Installer for the collective.metadataversion package."""
+# Python compatibility:
 from __future__ import absolute_import
 
-from setuptools import find_packages
-from setuptools import setup
+# Setup tools:
+from setuptools import find_packages, setup
+
+# Standard library:
 from os.path import isfile
 
 package_name = 'collective.metadataversion'
@@ -173,6 +176,7 @@ setup_kwargs = dict(
     """,
 )
 if 0:
+    # Standard library:
     from pprint import pprint
     del setup_kwargs['long_description']
     pprint(setup_kwargs)
