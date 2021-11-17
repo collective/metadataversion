@@ -169,6 +169,10 @@ setup_kwargs = dict(
     install_requires=[
         'setuptools',
         # -*- Extra requirements: -*-
+        'plone.indexer',
+        'plone.registry',
+        'Products.CMFCore',
+        'zope.component',
     ],
     entry_points="""
     [z3c.autoinclude.plugin]

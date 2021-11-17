@@ -6,7 +6,7 @@ collective.metadataversion: "indexers" (more precisely, metadata adapters)
 from __future__ import absolute_import
 
 # Zope:
-from Products.CMFCore.interfaces import IIndexableObject
+from Products.CMFCore.interfaces import IContentish
 from zope.component import getUtility
 
 # Plone:
@@ -17,7 +17,7 @@ from plone.registry.interfaces import IRegistry
 from .config import FULL_VERSION_KEY
 
 
-@indexer(IIndexableObject)
+@indexer(IContentish)
 def metadata_version(object):
     # simply return the current value, as last set
     registry = getUtility(IRegistry)

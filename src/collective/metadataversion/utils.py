@@ -31,6 +31,7 @@ try:
 
     # Local imports:
     from .config import FULL_VERSION_KEY, VERSION_KEY
+    from .config import FULL_IDXS_KEY
     from .exceptions import (
         ObjectNotFound,
         ReindexingError,
@@ -42,8 +43,13 @@ except ImportError as e:
         VERSION_KEY = 'metadata_version'
         FULL_VERSION_KEY = ('collective.metadataversion.interfaces'
                             '.IMetadataSettings.metadata_version')
+        FULL_IDXS_KEY = ('collective.metadataversion.interfaces'
+                         '.IMetadataSettings.default_idxs')
         IRegistry = None  # good enough for our doctest
-        fake_registry = {FULL_VERSION_KEY: 42}
+        fake_registry = {
+            FULL_VERSION_KEY: 42,
+            FULL_IDXS_KEY: ['getId'],
+            }
         def getUtility(*args, **kw):
             return fake_registry
         HAVE_MISSING = 0
@@ -166,7 +172,7 @@ def _update_mmu_kwargs(context, logger, metadata_version, kwargs):
         if kwargs.get('force_indexes'):
             idxs = None  # refresh all indexes
         else:
-            idxs = ['getId']  # default: a cheap subset
+            idxs = list(registry[FULL_IDXS_KEY])  # default: a cheap subset
         kwargs['idxs'] = idxs
 
     kwargs.update({

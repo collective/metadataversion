@@ -14,6 +14,7 @@ from plone.supermodel import model
 
 # Local imports:
 from ._i18n import _
+from .config import DEFAULT_IDXS
 
 
 class IMetadataSettings(model.Schema):
@@ -27,3 +28,18 @@ class IMetadataSettings(model.Schema):
             u'update_metadata=True; this helps you to reindex objects only '
             u'when needed, and reindex more later, skipping the already '
             u'reindexed objects.'))
+
+    default_idxs = schema.List(
+        title=_(u'Default indexes'),
+        value_type=schema.BytesLine(title=_(u'ID of an index')),
+        default=DEFAULT_IDXS,
+        missing_value=DEFAULT_IDXS,
+        description=_(
+            u'help_default_idxs',
+            default=u'Specify a (short) list of very "cheap" indexes '
+            u'to be refreshed when metadata-only reindexing is requested, '
+            u'e.g. [getId].\n'
+            u'NOTE: '
+            u'This affects only operations which use this value explicitly, '
+            u'like the use of an updater which was created by '
+            u'collective.metadataversion.utils.make_metadata_updater.'))

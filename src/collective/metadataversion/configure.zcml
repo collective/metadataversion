@@ -8,6 +8,12 @@
     xmlns:zcml="http://namespaces.zope.org/zcml">
 
   <i18n:registerTranslations directory="locales" />
+
+  <adapter
+      name="metadata_version"
+      factory=".catalog.metadata_version"
+      />
+
   <include file="profiles.zcml" />
 
   <!-- -*- extra stuff goes here -*- -->
