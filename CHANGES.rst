@@ -2,6 +2,20 @@ Changelog
 =========
 
 
+0.2.1 (2022-03-04)
+------------------
+
+New Features:
+
+- New function .utils.extract_mmu_kwargs
+
+Improvements:
+
+- Improved the docstring of .utils.make_metadata_updater
+
+[tobiasherp]
+
+
 0.2.0 (2021-11-17)
 ------------------
 

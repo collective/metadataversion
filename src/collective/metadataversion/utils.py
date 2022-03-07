@@ -15,10 +15,12 @@ from __future__ import absolute_import
 
 __all__ = [
     'make_metadata_updater',
+    'extract_mmu_kwargs',  # helper for functions to call the former
     ]
 
 try:
     # Zope:
+    from Missing import Value as Missing_Value
     from Products.CMFCore.utils import getToolByName
     from ZODB.POSException import ConflictError
     from zope.component import getUtility
@@ -26,12 +28,8 @@ try:
     # Plone:
     from plone.registry.interfaces import IRegistry
 
-    # 3rd party:
-    from Missing import Value as Missing_Value
-
     # Local imports:
-    from .config import FULL_VERSION_KEY, VERSION_KEY
-    from .config import FULL_IDXS_KEY
+    from .config import FULL_IDXS_KEY, FULL_VERSION_KEY, VERSION_KEY
     from .exceptions import (
         ObjectNotFound,
         ReindexingError,
@@ -188,7 +186,7 @@ def _update_mmu_kwargs(context, logger, metadata_version, kwargs):
 def make_metadata_updater(context, logger=None, metadata_version=None,
                           **kwargs):
     """
-    Create an updater to conditionally update the metadata of an object.
+    Persistently update the metadata_version and return an updater function.
 
     Arguments:
 
@@ -197,9 +195,11 @@ def make_metadata_updater(context, logger=None, metadata_version=None,
               metadata_version; if not given, we'll create one.
     metadata_version -- an integer number, or None.
                    If a number, it should be greater than the previously active
-                   version.
+                   version; otherwise, the number won't be stored unless
+                   affirmed by force_version=True (below).
 
-    The remaining arguments are "keyword-only":
+    The further arguments are "keyword-only":
+
     force_version -- change the target metadata_version even if smaller than
                    the previously active version. We expect this to be used
                    for development only.
@@ -209,7 +209,8 @@ def make_metadata_updater(context, logger=None, metadata_version=None,
             updated.  The default value depends on the value of the
             force_indexes option:
 
-            - If falsy (default), we use a "cheap selection" (['getId']),
+            - If falsy (default), we use a "cheap selection"
+              (like configured; e.g. ['getId']),
               simply to make the metadata refresh happen;
             - otherwise, the default is `None`, causing all indexes to be
               updated (but -- with update_metadata=None (the default) -- not
@@ -220,6 +221,9 @@ def make_metadata_updater(context, logger=None, metadata_version=None,
             or not.
     force_indexes -- Refresh the indexes (according to the idxs option above)
             even if the metadata is already up-to-date.
+
+    Thus, if you *specify* ``idxs=None`` but not `force_indexes`, all indexes
+    will be updated as well if the metadata is considered outdated.
 
     ... and finally:
 
@@ -324,6 +328,54 @@ def make_metadata_updater(context, logger=None, metadata_version=None,
             return True
 
     return reindex
+
+
+def extract_mmu_kwargs(kw, do_pop=1):
+    """
+    Little helper for functions which call make_metadata_updater
+
+    With do_pop=1 (the default), the known keys are removed from the source
+    keywords dict:
+
+    >>> kw = {'the_answer': 42, 'force_version': 1}
+    >>> extract_mmu_kwargs(kw)
+    {'force_version': 1}
+    >>> kw
+    {'the_answer': 42}
+
+    To keep the source dict unchanged, you can specify do_pop=0.
+    The following example contains all currently extracted keys:
+
+    >>> kw = {
+    ... 'the_answer': 42,
+    ... 'metadata_version': 24,
+    ... 'idxs': ['getId', 'sortable_title'],
+    ... 'force_version': 0,
+    ... 'force_indexes': 1,
+    ... }
+    >>> sorted(extract_mmu_kwargs(kw, 0).items())
+    ...                               # doctest: +NORMALIZE_WHITESPACE
+    [('force_indexes',    1),
+     ('force_version',    0),
+     ('idxs',             ['getId', 'sortable_title']),
+     ('metadata_version', 24)]
+    >>> sorted(kw.items())            # doctest: +NORMALIZE_WHITESPACE
+    [('force_indexes',    1),
+     ('force_version',    0),
+     ('idxs',             ['getId', 'sortable_title']),
+     ('metadata_version', 24),
+     ('the_answer',       42)]
+    """
+    res = {}
+    get = (kw.pop if do_pop else kw.get)
+    for key in (
+        'metadata_version',
+        'idxs',
+        'force_version', 'force_indexes',
+        ):
+        if key in kw:
+            res[key] = get(key)
+    return res
 
 
 if __name__ == '__main__':
