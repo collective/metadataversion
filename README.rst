@@ -17,7 +17,7 @@ searched and the search results are listed.
 
 Those metadata columns -- like index values -- can be customized,
 and they can evolve over time, as your customization package(s) evolve(s).
-If your database is small, you'll happily reindex the whole data
+If your database is small, you might happily reindex the whole database
 whenenver you change something to your metadata (or indexes).
 Or if your metadata is really cheap.
 
@@ -56,10 +56,15 @@ In your policy package's setuphandler module, you may have::
   from collective.metadataversion.decorator import step
   from collective.metadataversion.utils import make_metadata_updater
 
+  #  1 - introduce metadata_version
+  #  2 - append slash to .landing_path
+  #  3 - adjust .landing_path for FancyType objects
+  METADATA_VERSION = 3
+
   ...
   @step
   def update_metadata_of_prominent_objects(context, logger):
-      reindex = make_metadata_updater(context, logger, 42)
+      reindex = make_metadata_updater(context, logger, METADATA_VERSION)
       catalog = getToolByName(context, 'portal_catalog')
       updated, skipped = 0, 0
       for brain in catalog(<my fancy query>):
@@ -71,7 +76,7 @@ In your policy package's setuphandler module, you may have::
 
   @step
   def update_metadata_of_remaining_objects(context, logger):
-      reindex = make_metadata_updater(context, logger, 42)
+      reindex = make_metadata_updater(context, logger, METADATA_VERSION)
       catalog = getToolByName(context, 'portal_catalog')
       updated, skipped = 0, 0
       for brain in catalog({}):
@@ -80,6 +85,17 @@ In your policy package's setuphandler module, you may have::
           else:
               skipped += 1
       (... logging ad libitum ...)
+
+  @step
+  def adjust_metadata_version_only(context, logger):
+      """
+      We don't need to reindex anything just now,
+      or we just want to quickly activate the new version
+      (which will then be applied on any change to an object)
+      before starting a really long-running job.
+      """
+      # just use the side effect: persistently update the metadata_version
+      make_metadata_updater(context, logger, METADATA_VERSION)
 
 The `reindex` function returned by make_metadata_updater() will reindex every
 object (given by brain) which has not been recently reindexed (with
@@ -106,6 +122,12 @@ Notes
 
 - There are a few keyword-only options for customization.
 
+- It is theoretically possible to update single metadata columns
+  (see e.g.  plone.app.upgrade_.utils.updateIconsInBrains);
+  such cases are of course not taken into account.
+  We update our `metadata_version` whenever the metadata is updated,
+  using the normally used API.
+
 
 Translations
 ============
@@ -119,13 +141,12 @@ This product has been translated into
 Installation
 ============
 
-Install collective.metadataversion by adding it to your buildout::
+Install collective.metadataversion_ by adding it to your buildout::
 
     [buildout]
     ...
     eggs =
-        collective.metadataversion
-
+        collective.metadataversion_
 
 and then running ``bin/buildout``.
 
@@ -157,6 +178,8 @@ License
 
 The project is licensed under the GPLv2.
 
+.. _collective.metadataversion: https://pypi.org/project/collective.metadataversion
 .. _`issue tracker`: https://github.com/collective/metadataversion/issues
+.. _plone.app.upgrade: https://pypi.org/project/plone.app.upgrade
 
 .. vim: tw=79 cc=+1 sw=4 sts=4 si et
