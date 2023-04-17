@@ -67,7 +67,7 @@ In your policy package's setuphandler module, you may have::
       reindex = make_metadata_updater(context, logger, METADATA_VERSION)
       catalog = getToolByName(context, 'portal_catalog')
       updated, skipped = 0, 0
-      for brain in catalog(<my fancy query>):
+      for brain in catalog(<fancy query>):
           if reindex(brain):
               updated += 1
           else:
@@ -105,7 +105,7 @@ Starting with the 2nd call to the first upgrade step, nothing will be actually
 reindexed anymore (unless your <fancy query> spans some more objects now), since
 everything is up-to-date;
 the 2nd upgrade step will update all remaining objects (which might not need to
-be updated so urgently), and skip all objects caught by the <fancy query>.
+be updated so urgently), and skip all objects caught by the `<fancy query>`.
 
 
 Notes

@@ -12,7 +12,9 @@
   <adapter
       name="metadata_version"
       factory=".catalog.metadata_version"
-      />
+      /><!-- gf:
+          catalog.py
+          -->
 
   <include file="profiles.zcml" />
 
