@@ -99,7 +99,7 @@ In your policy package's setuphandler module, you may have::
 
 The `reindex` function returned by make_metadata_updater() will reindex every
 object (given by brain) which has not been recently reindexed (with
-metadata_version=42), and by default refresh a "cheap" selection of indexes.
+metadata_version=3), and by default refresh a "cheap" selection of indexes.
 
 Starting with the 2nd call to the first upgrade step, nothing will be actually
 reindexed anymore (unless your <fancy query> spans some more objects now), since
