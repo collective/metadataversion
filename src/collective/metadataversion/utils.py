@@ -227,8 +227,9 @@ def make_metadata_updater(context, logger=None, metadata_version=None,
     force_indexes -- Refresh the indexes (according to the idxs option above)
             even if the metadata is already up-to-date.
 
-    Thus, if you *specify* ``idxs=None`` but not `force_indexes`, all indexes
-    will be updated as well if the metadata is considered outdated.
+    Thus, if you *specify* ``idxs=None``, the "cheap subset" default doesn't
+    apply; if the metadata is considered outdated, or if forced, *all* indexes
+    will be updated.
 
     change -- a function(object, logger) to be called before reindexing is
               performed.
@@ -240,6 +241,19 @@ def make_metadata_updater(context, logger=None, metadata_version=None,
               if the changes applied by the function might cause more idxs to
               rot, you currently need to add those to the list (for all),
               or to specify idxs=None (which will include all indexes).
+
+    reindex_changed_only --
+            (NOT YET IMPLEMENTED!)
+            If (after consideration of the metadata_version
+            which might prevent it from being called at all)
+            the `change` function returns
+            something non-None falsy,
+            don't reindex the object.
+
+            Defaults to False; if True, a `change` function is required as
+            well
+            (to try the changes and return None / something truish to say
+            "yes, please reindex" or something non-None falsy otherwise)
 
     ... and finally:
 
